@@ -33,15 +33,11 @@ public interface IEventDispatcher {
 
 	public void addEventListener(String type, IEventListener listener, boolean useCapture, int priority);
 
-	public void addEventListener(String type, IEventListener listener, boolean useCapture);
-
-	public void addEventListener(String type, IEventListener listener);
-
 	public void dispatchEvent(Event event);
 
 	public boolean hasEventListener(String type);
 
-	public void removeEventListener(String type, IEventListener listener);
+	public void removeEventListener(String type, IEventListener listener, boolean useCapture);
 
 	public abstract boolean willTrigger(String type);
 }

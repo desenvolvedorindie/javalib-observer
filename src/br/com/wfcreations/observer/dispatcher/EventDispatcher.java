@@ -29,7 +29,6 @@
  */
 package br.com.wfcreations.observer.dispatcher;
 
-import java.lang.reflect.Field;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Iterator;
@@ -38,7 +37,7 @@ import java.util.List;
 
 public class EventDispatcher implements IEventDispatcher {
 
-	private List<EventListenerObject> events = new LinkedList<>();
+	List<EventListenerObject> events = new LinkedList<>();
 
 	IEventDispatcher target;
 
@@ -70,73 +69,37 @@ public class EventDispatcher implements IEventDispatcher {
 	}
 
 	public void dispatchEvent(Event event) {
-		if (event.getTarget() == null)
-			setFieldValue(event, "target", this);
+		if (event._target == null)
+			event._target = this;
 
-		if ((boolean) getFieldValue(event, "stop"))
+		if (event.stop)
 			return;
 
-		if (target != null && (getFieldValue(event, "eventPhase") == null || getFieldValue(event, "eventPhase") == EventPhase.CAPTURING_PHASE)) {
-			setFieldValue(event, "eventPhase", EventPhase.CAPTURING_PHASE);
+		if (target != null && (event._eventPhase == null || event._eventPhase == EventPhase.CAPTURING_PHASE)) {
+			event._eventPhase = EventPhase.CAPTURING_PHASE;
 			target.dispatchEvent(event);
 		}
 
-		if (event.getTarget() == this) {
-			setFieldValue(event, "eventPhase", EventPhase.AT_TARGET);
-		}
-
-		if ((boolean) getFieldValue(event, "stop"))
+		if (event.stop)
 			return;
 
-		setFieldValue(event, "currentTarget", this);
+		if (event._target == this)
+			event._eventPhase = EventPhase.AT_TARGET;
+
+		event._currentTarget = this;
 		for (EventListenerObject eventListener : events) {
-			if ((boolean) getFieldValue(event, "immediate"))
+			if (event.immediate)
 				return;
-			if (eventListener.type == event.getType() && !(getFieldValue(event, "eventPhase") == EventPhase.CAPTURING_PHASE && !eventListener.useCapture))
+			if (eventListener.type == event.type && (eventListener.useCapture && event._eventPhase == EventPhase.CAPTURING_PHASE) || (!eventListener.useCapture && event._eventPhase != EventPhase.CAPTURING_PHASE))
 				eventListener.listener.listen(event);
 		}
 
-		if ((boolean) getFieldValue(event, "stop"))
+		if (event.stop)
 			return;
 
-		if (target != null && event.isBubbles() && (getFieldValue(event, "eventPhase") == EventPhase.BUBBLING_PHASE || getFieldValue(event, "eventPhase") == EventPhase.AT_TARGET)) {
-			setFieldValue(event, "eventPhase", EventPhase.BUBBLING_PHASE);
+		if (target != null && event.bubbles && (event._eventPhase == EventPhase.BUBBLING_PHASE || event._eventPhase == EventPhase.AT_TARGET)) {
+			event._eventPhase = EventPhase.BUBBLING_PHASE;
 			target.dispatchEvent(event);
-		}
-	}
-
-	private Object getFieldValue(Event event, String field) {
-		Object object = null;
-		try {
-			Field currentTargetField = event.getClass().getDeclaredField(field);
-			currentTargetField.setAccessible(true);
-			try {
-				object = currentTargetField.get(event);
-			} catch (IllegalArgumentException | IllegalAccessException e1) {
-				e1.printStackTrace();
-			} finally {
-				currentTargetField.setAccessible(false);
-			}
-			return object;
-		} catch (NoSuchFieldException | SecurityException e2) {
-			e2.printStackTrace();
-		}
-		return object;
-	}
-
-	private void setFieldValue(Event event, String field, Object value) {
-		try {
-			Field currentTargetField = event.getClass().getDeclaredField(field);
-			currentTargetField.setAccessible(true);
-			try {
-				currentTargetField.set(event, value);
-			} catch (IllegalArgumentException | IllegalAccessException e1) {
-				e1.printStackTrace();
-			} finally {
-				currentTargetField.setAccessible(false);
-			}
-		} catch (NoSuchFieldException | SecurityException e2) {
-			e2.printStackTrace();
 		}
 	}
 
@@ -149,13 +112,17 @@ public class EventDispatcher implements IEventDispatcher {
 	}
 
 	@Override
-	public void removeEventListener(String type, IEventListener listener) {
+	public void removeEventListener(String type, IEventListener listener, boolean useCapture) {
 		Iterator<EventListenerObject> iter = events.iterator();
 		while (iter.hasNext()) {
 			EventListenerObject element = iter.next();
-			if (element.type == type && element.listener == listener)
+			if (element.type == type && element.listener == listener && element.useCapture == useCapture)
 				iter.remove();
 		}
+	}
+
+	public void removeEventListener(String type, IEventListener listener) {
+		removeEventListener(type, listener, false);
 	}
 
 	@Override
@@ -165,17 +132,17 @@ public class EventDispatcher implements IEventDispatcher {
 		return false;
 	}
 
-	private static class EventListenerObject {
+	static class EventListenerObject {
 
-		public final String type;
+		final String type;
 
-		public final IEventListener listener;
+		final IEventListener listener;
 
-		public final boolean useCapture;
+		final boolean useCapture;
 
-		public final int priority;
+		final int priority;
 
-		public EventListenerObject(String type, IEventListener listener, boolean useCapture, int priority) {
+		EventListenerObject(String type, IEventListener listener, boolean useCapture, int priority) {
 			this.type = type;
 			this.listener = listener;
 			this.useCapture = useCapture;

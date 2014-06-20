@@ -31,23 +31,21 @@ package br.com.wfcreations.observer.dispatcher;
 
 public class Event {
 
-	private final String type;
+	public final String type;
 
-	private final boolean bubbles;
+	public final boolean bubbles;
 
-	private final boolean cancelable;
+	public final boolean cancelable;
 
-	private IEventDispatcher target;
+	IEventDispatcher _target;
 
-	private EventPhase eventPhase;
+	EventPhase _eventPhase;
 
-	private IEventDispatcher currentTarget;
+	IEventDispatcher _currentTarget;
 
-	@SuppressWarnings("unused")
-	private boolean stop;
+	boolean stop;
 
-	@SuppressWarnings("unused")
-	private boolean immediate;
+	boolean immediate;
 
 	public Event(String type, boolean bubbles, boolean cancelable) {
 		this.type = type;
@@ -77,27 +75,15 @@ public class Event {
 		}
 	}
 
-	public String getType() {
-		return type;
+	public IEventDispatcher currentTarget() {
+		return _currentTarget;
 	}
 
-	public boolean isCancelable() {
-		return cancelable;
+	public EventPhase eventPhase() {
+		return _eventPhase;
 	}
 
-	public IEventDispatcher getCurrentTarget() {
-		return currentTarget;
-	}
-
-	public EventPhase getEventPhase() {
-		return eventPhase;
-	}
-
-	public IEventDispatcher getTarget() {
-		return target;
-	}
-
-	public boolean isBubbles() {
-		return bubbles;
+	public IEventDispatcher target() {
+		return _target;
 	}
 }
