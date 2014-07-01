@@ -43,9 +43,9 @@ public class Event {
 
 	IEventDispatcher _currentTarget;
 
-	boolean stop;
+	boolean _stop;
 
-	boolean immediate;
+	boolean _immediate;
 
 	public Event(String type, boolean bubbles, boolean cancelable) {
 		this.type = type;
@@ -63,16 +63,14 @@ public class Event {
 
 	public void stopPropagation() {
 		if (cancelable) {
-			stop = true;
-			immediate = false;
+			_stop = true;
+			_immediate = false;
 		}
 	}
 
 	public void stopPropagationImmediate() {
-		if (cancelable) {
-			stop = true;
-			immediate = true;
-		}
+		if (cancelable)
+			_stop = _immediate = true;
 	}
 
 	public IEventDispatcher currentTarget() {

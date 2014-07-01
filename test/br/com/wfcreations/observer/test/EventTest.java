@@ -1,7 +1,5 @@
 package br.com.wfcreations.observer.test;
 
-import static org.junit.Assert.*;
-
 import org.junit.Test;
 
 import br.com.wfcreations.observer.dispatcher.Event;

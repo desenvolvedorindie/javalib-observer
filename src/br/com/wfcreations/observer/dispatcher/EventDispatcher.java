@@ -39,7 +39,7 @@ public class EventDispatcher implements IEventDispatcher {
 
 	List<EventListenerObject> events = new LinkedList<>();
 
-	IEventDispatcher target;
+	IEventDispatcher target = null;
 
 	private static Comparator<EventListenerObject> comparator = new Comparator<EventListenerObject>() {
 		@Override
@@ -48,11 +48,11 @@ public class EventDispatcher implements IEventDispatcher {
 		}
 	};
 
-	public EventDispatcher(IEventDispatcher target) {
-		this.target = target;
+	public EventDispatcher() {
 	}
 
-	public EventDispatcher() {
+	public EventDispatcher(IEventDispatcher target) {
+		this.target = target;
 	}
 
 	public void addEventListener(String type, IEventListener listener, boolean useCapture, int priority) {
@@ -72,29 +72,28 @@ public class EventDispatcher implements IEventDispatcher {
 		if (event._target == null)
 			event._target = this;
 
-		if (event.stop)
+		if (event._stop)
 			return;
 
 		if (target != null && (event._eventPhase == null || event._eventPhase == EventPhase.CAPTURING_PHASE)) {
 			event._eventPhase = EventPhase.CAPTURING_PHASE;
 			target.dispatchEvent(event);
+			if (event._stop)
+				return;
 		}
-
-		if (event.stop)
-			return;
 
 		if (event._target == this)
 			event._eventPhase = EventPhase.AT_TARGET;
 
 		event._currentTarget = this;
 		for (EventListenerObject eventListener : events) {
-			if (event.immediate)
+			if (event._immediate)
 				return;
 			if (eventListener.type == event.type && (eventListener.useCapture && event._eventPhase == EventPhase.CAPTURING_PHASE) || (!eventListener.useCapture && event._eventPhase != EventPhase.CAPTURING_PHASE))
 				eventListener.listener.listen(event);
 		}
 
-		if (event.stop)
+		if (event._stop)
 			return;
 
 		if (target != null && event.bubbles && (event._eventPhase == EventPhase.BUBBLING_PHASE || event._eventPhase == EventPhase.AT_TARGET)) {
