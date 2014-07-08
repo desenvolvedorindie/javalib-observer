@@ -84,4 +84,9 @@ public class Event {
 	public IEventDispatcher target() {
 		return _target;
 	}
+
+	@Override
+	public Event clone() {
+		return new Event(this.type, this.bubbles, this.cancelable);
+	}
 }
