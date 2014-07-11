@@ -89,7 +89,7 @@ public class EventDispatcher implements IEventDispatcher {
 		for (EventListenerObject eventListener : events) {
 			if (event._immediate)
 				return;
-			if (eventListener.type == event.type && (eventListener.useCapture && event._eventPhase == EventPhase.CAPTURING_PHASE) || (!eventListener.useCapture && event._eventPhase != EventPhase.CAPTURING_PHASE))
+			if (eventListener.type.equals(event.type) && ((eventListener.useCapture && event._eventPhase == EventPhase.CAPTURING_PHASE) || (!eventListener.useCapture && event._eventPhase != EventPhase.CAPTURING_PHASE)))
 				eventListener.listener.listen(event);
 		}
 
@@ -105,7 +105,7 @@ public class EventDispatcher implements IEventDispatcher {
 	@Override
 	public boolean hasEventListener(String type) {
 		for (EventListenerObject eventListener : events)
-			if (eventListener.type == type)
+			if (eventListener.type.equals(type))
 				return true;
 		return false;
 	}
@@ -115,7 +115,7 @@ public class EventDispatcher implements IEventDispatcher {
 		Iterator<EventListenerObject> iter = events.iterator();
 		while (iter.hasNext()) {
 			EventListenerObject element = iter.next();
-			if (element.type == type && element.listener == listener && element.useCapture == useCapture)
+			if (element.type.equals(type) && element.listener.equals(listener) && element.useCapture == useCapture)
 				iter.remove();
 		}
 	}
