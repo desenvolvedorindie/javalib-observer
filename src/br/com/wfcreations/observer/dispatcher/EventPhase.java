@@ -29,6 +29,8 @@
  */
 package br.com.wfcreations.observer.dispatcher;
 
-public enum EventPhase {
+import java.io.Serializable;
+
+public enum EventPhase implements Serializable {
 	CAPTURING_PHASE, AT_TARGET, BUBBLING_PHASE
 }

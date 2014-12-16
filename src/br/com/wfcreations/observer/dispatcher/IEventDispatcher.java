@@ -29,7 +29,9 @@
  */
 package br.com.wfcreations.observer.dispatcher;
 
-public interface IEventDispatcher {
+import java.io.Serializable;
+
+public interface IEventDispatcher extends Serializable {
 
 	public void addEventListener(String type, IEventListener listener, boolean useCapture, int priority);
 

@@ -37,6 +37,8 @@ import java.util.List;
 
 public class EventDispatcher implements IEventDispatcher {
 
+	private static final long serialVersionUID = 1L;
+
 	List<EventListenerObject> events = new LinkedList<>();
 
 	IEventDispatcher target = null;
